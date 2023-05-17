@@ -1,0 +1,47 @@
+﻿@page "/stores"
+
+@inject IRepository<Store> StoreRepository
+
+<PageTitle>Stores</PageTitle>
+
+<h1>Stores</h1>
+
+@if (stores == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>IsEnabled</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var store in stores)
+            {
+                <tr>
+                    <td>@store.Id</td>
+                    <td>@store.Name</td>
+                    <td>@store.EmailAddress</td>
+                    <td>@store.Address</td>
+                    <td>@store.IsEnabled</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Store[]? stores;
+
+    protected override async Task OnInitializedAsync()
+    {
+        stores = await StoreRepository.ListAsync();
+    }
+}
