@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using StoreAdmin.Core;
 using StoreAdmin.Core.Data;
 using StoreAdmin.Core.Stores;
 using StoreAdmin.Core.Users;
@@ -47,5 +48,10 @@ async Task CreateDatabaseAsync()
     var contextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<WorkshopDbContext>>();
     var context = await contextFactory.CreateDbContextAsync();
 
-    await context.Database.EnsureCreatedAsync();
+    if (await context.Database.EnsureCreatedAsync())
+    {
+        var storeRepository = scope.ServiceProvider.GetRequiredService<IRepository<Store>>();
+        var userRepository = scope.ServiceProvider.GetRequiredService<IRepository<User>>();
+        await ExampleDataSeeder.RunAsync(storeRepository, userRepository);
+    }
 }
