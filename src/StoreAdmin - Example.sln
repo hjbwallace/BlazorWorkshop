@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoreAdmin.Core", "StoreAdm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoreAdmin.ExampleApp", "StoreAdmin.ExampleApp\StoreAdmin.ExampleApp.csproj", "{3243F683-BEA2-4092-8735-7A4B1324B119}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoreAdmin.Core.Tests", "StoreAdmin.Core.Tests\StoreAdmin.Core.Tests.csproj", "{4773D9CF-0491-4C55-A2FF-ED6011C312B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{3243F683-BEA2-4092-8735-7A4B1324B119}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3243F683-BEA2-4092-8735-7A4B1324B119}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3243F683-BEA2-4092-8735-7A4B1324B119}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4773D9CF-0491-4C55-A2FF-ED6011C312B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4773D9CF-0491-4C55-A2FF-ED6011C312B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4773D9CF-0491-4C55-A2FF-ED6011C312B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4773D9CF-0491-4C55-A2FF-ED6011C312B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
