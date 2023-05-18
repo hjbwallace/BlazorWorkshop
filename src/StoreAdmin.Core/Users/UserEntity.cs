@@ -18,7 +18,7 @@ namespace StoreAdmin.Core.Users
                 EmailAddress = entity.EmailAddress,
                 IsEnabled = entity.IsEnabled,
                 Name = entity.Name,
-                StoreIds = entity.Stores.Select(x => x.Id).ToArray(),
+                StoreIds = entity.Stores.Select(x => x.Id).Distinct().ToArray(),
             };
         }
 
@@ -30,7 +30,7 @@ namespace StoreAdmin.Core.Users
                 EmailAddress = user.EmailAddress,
                 IsEnabled = user.IsEnabled,
                 Name = user.Name,
-                Stores = user.StoreIds.Select(x => new StoreEntity { Id = x }).ToList(),
+                Stores = user.StoreIds.Distinct().Select(x => new StoreEntity { Id = x }).ToList(),
             };
         }
     }
