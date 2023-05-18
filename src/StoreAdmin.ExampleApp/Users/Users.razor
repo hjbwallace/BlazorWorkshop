@@ -1,0 +1,53 @@
+﻿@page "/users"
+
+@inject IRepository<User> UserRepository
+
+<PageTitle>Users | Store Admin</PageTitle>
+
+<h1>Users</h1>
+
+<div>
+    <a href="/users/create" class="btn btn-primary">Create</a>
+</div>
+
+@if (users == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>IsEnabled</th>
+                <th>Store Count</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@user.Name</td>
+                    <td>@user.EmailAddress</td>
+                    <td>@user.IsEnabled</td>
+                    <td>@user.StoreIds.Count()</td>
+                    <td><a href="/users/@user.Id" class="btn btn-secondary">Edit</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private User[]? users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await UserRepository.ListAsync();
+    }
+}
