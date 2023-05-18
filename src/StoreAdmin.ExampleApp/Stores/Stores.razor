@@ -2,9 +2,13 @@
 
 @inject IRepository<Store> StoreRepository
 
-<PageTitle>Stores</PageTitle>
+<PageTitle>Stores | Store Admin</PageTitle>
 
 <h1>Stores</h1>
+
+<div>
+    <a href="/stores/create" class="btn btn-primary">Create</a>
+</div>
 
 @if (stores == null)
 {
@@ -20,6 +24,7 @@ else
                 <th>Email</th>
                 <th>Address</th>
                 <th>IsEnabled</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -31,6 +36,7 @@ else
                     <td>@store.EmailAddress</td>
                     <td>@store.Address</td>
                     <td>@store.IsEnabled</td>
+                    <td><a href="/stores/@store.Id" class="btn btn-secondary">Edit</a></td>
                 </tr>
             }
         </tbody>

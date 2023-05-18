@@ -1,0 +1,61 @@
+﻿@page "/stores/{StoreId:int}"
+
+@inject IRepository<Store> StoreRepository
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Store: @store?.Name | Store Admin</PageTitle>
+
+<h3>Edit Store: @store?.Name</h3>
+
+@if (store == null)
+{
+    return;
+}
+
+<EditForm Model="@store" OnValidSubmit="UpdateStoreAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="@store.Name" class="control-label">Name:</label>
+        <InputText id="name" @bind-Value="@store.Name" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="@store.EmailAddress" class="control-label">Email:</label>
+        <InputText id="email" @bind-Value="@store.EmailAddress" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="@store.Address" class="control-label">Address:</label>
+        <InputText id="address" @bind-Value="@store.Address" class="form-control" placeholder="123 Fake Street, Perth, WA 6000" />
+    </div>
+
+    <div class="form-check form-check-inline" style="width: 200px">
+        <InputCheckbox type="checkbox" @bind-Value="@store.IsEnabled" class="form-check-input" />
+        <label class="form-check-label" for="@store.IsEnabled">Enabled?</label>
+    </div>
+
+    <div>
+        <button type="submit" class="btn btn-success">Save</button>
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int StoreId { get; set; }
+
+    private Store? store;
+
+    protected override async Task OnInitializedAsync()
+    {
+        store = await StoreRepository.GetAsync(StoreId);
+    }
+
+    private async Task UpdateStoreAsync()
+    {
+        await StoreRepository.UpdateAsync(store);
+        NavigationManager.NavigateTo("/stores");
+    }
+}
