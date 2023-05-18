@@ -1,0 +1,37 @@
+﻿<EditForm Model="@User" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="@User.Name" class="control-label">Name:</label>
+        <InputText id="name" @bind-Value="@User.Name" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="@User.EmailAddress" class="control-label">Email:</label>
+        <InputText id="email" @bind-Value="@User.EmailAddress" class="form-control" />
+    </div>
+
+    <div class="form-check form-check-inline" style="width: 200px">
+        <InputCheckbox type="checkbox" @bind-Value="@User.IsEnabled" class="form-check-input" />
+        <label class="form-check-label" for="@User.IsEnabled">Enabled?</label>
+    </div>
+
+    <div>
+        <button type="submit" class="btn btn-success">Save</button>
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public User User { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public EventCallback<User> OnSubmit { get; set; }
+
+    private async Task OnValidSubmit()
+    {
+        await OnSubmit.InvokeAsync(User);
+    }
+}

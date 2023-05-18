@@ -1,0 +1,42 @@
+﻿@page "/users/{UserId:int}"
+
+@inject IRepository<User> UserRepository
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit User: @user?.Name | Store Admin</PageTitle>
+
+<h1>Edit User: @user?.Name</h1>
+
+@if (isLoading)
+{
+    <p><em>Loading...</em></p>
+}
+else if (user == null)
+{
+    <p>No user found!</p>
+}
+else
+{
+    <UserForm User="user" OnSubmit="UpdateUserAsync" />
+}
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+
+    private bool isLoading;
+    private User? user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        user = await UserRepository.GetAsync(UserId);
+        isLoading = false;
+    }
+
+    private async Task UpdateUserAsync(User user)
+    {
+        await UserRepository.UpdateAsync(user);
+        NavigationManager.NavigateTo("/users");
+    }
+}

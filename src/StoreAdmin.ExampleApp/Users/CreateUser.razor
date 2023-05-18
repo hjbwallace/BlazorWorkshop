@@ -1,0 +1,20 @@
+﻿@page "/users/create"
+
+@inject IRepository<User> UserRepository
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create User | Store Admin</PageTitle>
+
+<h1>Create User</h1>
+
+<UserForm User=user OnSubmit="CreateUserAsync" />
+
+@code {
+    private User user = new() { IsEnabled = true };
+
+    private async Task CreateUserAsync(User user)
+    {
+        await UserRepository.CreateAsync(user);
+        NavigationManager.NavigateTo("/users");
+    }
+}
