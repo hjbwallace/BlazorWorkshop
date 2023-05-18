@@ -5,55 +5,36 @@
 
 <PageTitle>Edit Store: @store?.Name | Store Admin</PageTitle>
 
-<h3>Edit Store: @store?.Name</h3>
+<h1>Edit Store: @store?.Name</h1>
 
-@if (store == null)
+@if (isLoading)
 {
-    return;
+    <p><em>Loading...</em></p>
 }
-
-<EditForm Model="@store" OnValidSubmit="UpdateStoreAsync">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div class="form-group">
-        <label for="@store.Name" class="control-label">Name:</label>
-        <InputText id="name" @bind-Value="@store.Name" class="form-control" />
-    </div>
-
-    <div class="form-group">
-        <label for="@store.EmailAddress" class="control-label">Email:</label>
-        <InputText id="email" @bind-Value="@store.EmailAddress" class="form-control" />
-    </div>
-
-    <div class="form-group">
-        <label for="@store.Address" class="control-label">Address:</label>
-        <InputText id="address" @bind-Value="@store.Address" class="form-control" placeholder="123 Fake Street, Perth, WA 6000" />
-    </div>
-
-    <div class="form-check form-check-inline" style="width: 200px">
-        <InputCheckbox type="checkbox" @bind-Value="@store.IsEnabled" class="form-check-input" />
-        <label class="form-check-label" for="@store.IsEnabled">Enabled?</label>
-    </div>
-
-    <div>
-        <button type="submit" class="btn btn-success">Save</button>
-    </div>
-
-</EditForm>
+else if (store == null)
+{
+    <p>No store found!</p>
+}
+else
+{
+    <StoreForm Store="store" OnSubmit="UpdateStoreAsync" />
+}
 
 @code {
     [Parameter]
     public int StoreId { get; set; }
 
+    private bool isLoading;
     private Store? store;
 
     protected override async Task OnInitializedAsync()
     {
+        isLoading = true;
         store = await StoreRepository.GetAsync(StoreId);
+        isLoading = false;
     }
 
-    private async Task UpdateStoreAsync()
+    private async Task UpdateStoreAsync(Store store)
     {
         await StoreRepository.UpdateAsync(store);
         NavigationManager.NavigateTo("/stores");

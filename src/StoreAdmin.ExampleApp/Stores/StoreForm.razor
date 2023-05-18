@@ -1,0 +1,42 @@
+﻿<EditForm Model="@Store" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="@Store.Name" class="control-label">Name:</label>
+        <InputText id="name" @bind-Value="@Store.Name" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="@Store.EmailAddress" class="control-label">Email:</label>
+        <InputText id="email" @bind-Value="@Store.EmailAddress" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="@Store.Address" class="control-label">Address:</label>
+        <InputText id="address" @bind-Value="@Store.Address" class="form-control" placeholder="123 Fake Street, Perth, WA 6000" />
+    </div>
+
+    <div class="form-check form-check-inline" style="width: 200px">
+        <InputCheckbox type="checkbox" @bind-Value="@Store.IsEnabled" class="form-check-input" />
+        <label class="form-check-label" for="@Store.IsEnabled">Enabled?</label>
+    </div>
+
+    <div>
+        <button type="submit" class="btn btn-success">Save</button>
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public Store Store { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public EventCallback<Store> OnSubmit { get; set; }
+
+    private async Task OnValidSubmit()
+    {
+        await OnSubmit.InvokeAsync(Store);
+    }
+}

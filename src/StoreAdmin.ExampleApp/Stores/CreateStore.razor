@@ -5,42 +5,14 @@
 
 <PageTitle>Create Store | Store Admin</PageTitle>
 
-<h3>Create Store</h3>
+<h1>Create Store</h1>
 
-<EditForm Model="@store" OnValidSubmit="CreateStoreAsync">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div class="form-group">
-        <label for="@store.Name" class="control-label">Name:</label>
-        <InputText id="name" @bind-Value="@store.Name" class="form-control" />
-    </div>
-
-    <div class="form-group">
-        <label for="@store.EmailAddress" class="control-label">Email:</label>
-        <InputText id="email" @bind-Value="@store.EmailAddress" class="form-control" />
-    </div>
-
-    <div class="form-group">
-        <label for="@store.Address" class="control-label">Address:</label>
-        <InputText id="address" @bind-Value="@store.Address" class="form-control" placeholder="123 Fake Street, Perth, WA 6000" />
-    </div>
-
-    <div class="form-check form-check-inline" style="width: 200px">
-        <InputCheckbox type="checkbox" @bind-Value="@store.IsEnabled" class="form-check-input" />
-        <label class="form-check-label" for="@store.IsEnabled">Enabled?</label>
-    </div>
-
-    <div>
-        <button type="submit" class="btn btn-success">Save</button>
-    </div>
-
-</EditForm>
+<StoreForm Store=store OnSubmit="CreateStoreAsync" />
 
 @code {
     private Store store = new() { IsEnabled = true };
 
-    private async Task CreateStoreAsync()
+    private async Task CreateStoreAsync(Store store)
     {
         await StoreRepository.CreateAsync(store);
         NavigationManager.NavigateTo("/stores");
