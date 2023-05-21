@@ -1,4 +1,8 @@
-﻿<EditForm Model="@User" OnValidSubmit="OnValidSubmit">
+﻿@using StoreAdmin.Core.Stores
+
+@inject IRepository<Store> StoreRepository
+
+<EditForm Model="@User" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -17,6 +21,29 @@
         <label class="form-check-label" for="@User.IsEnabled">Enabled?</label>
     </div>
 
+    <h5>Stores</h5>
+
+    <div class="form-group">
+        @if (storeSelections == null)
+        {
+            <p><em>Loading Stores...</em></p>
+        }
+        else if (!storeSelections.Any())
+        {
+            <p><em>No stores found</em></p>
+        }
+        else
+        {
+            @foreach (var storeSelection in storeSelections)
+            {
+                <div class="form-check form-check-inline" style="width: 200px">
+                    <InputCheckbox type="checkbox" @bind-Value="@storeSelection.IsSelected" class="form-check-input" />
+                    <label class="form-check-label" for="@storeSelection.Name">@storeSelection.Name</label>
+                </div>
+            }
+        }
+    </div>
+
     <div>
         <button type="submit" class="btn btn-success">Save</button>
     </div>
@@ -24,14 +51,40 @@
 </EditForm>
 
 @code {
+    private StoreSelection[]? storeSelections;
+
     [Parameter, EditorRequired]
     public User User { get; set; } = null!;
 
     [Parameter, EditorRequired]
     public EventCallback<User> OnSubmit { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        var stores = await StoreRepository.ListAsync();
+        storeSelections = stores.Select(s => StoreSelection.Build(s, User)).ToArray();
+    }
+
     private async Task OnValidSubmit()
     {
+        User.StoreIds = storeSelections?.Where(x => x.IsSelected).Select(x => x.Id).ToArray() ?? Array.Empty<int>();
         await OnSubmit.InvokeAsync(User);
+    }
+
+    private class StoreSelection
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public bool IsSelected { get; set; }
+
+        public static StoreSelection Build(Store store, User user)
+        {
+            return new StoreSelection
+            {
+                Id = store.Id,
+                Name = store.Name,
+                IsSelected = user.StoreIds.Contains(store.Id),
+            };
+        }
     }
 }
