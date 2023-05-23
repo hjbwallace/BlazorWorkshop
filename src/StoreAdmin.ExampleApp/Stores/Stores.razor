@@ -10,7 +10,14 @@
     <a href="/stores/create" class="btn btn-primary">Create</a>
 </div>
 
-@if (stores == null)
+<EditForm Model="criteria" OnValidSubmit="FilterStores">
+    <div class="input-group my-2">
+        <InputText id="name" @bind-Value="@criteria.Name" class="form-control" placeholder="Search stores" />
+        <button type="submit" class="btn btn-secondary">Filter</button>
+    </div>
+</EditForm>
+
+@if (storeModels == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -28,15 +35,15 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var store in stores)
+            @foreach (var storeModel in storeModels.Where(x => x.IsVisible))
             {
                 <tr>
-                    <td>@store.Id</td>
-                    <td>@store.Name</td>
-                    <td>@store.EmailAddress</td>
-                    <td>@store.Address</td>
-                    <td>@store.IsEnabled</td>
-                    <td><a href="/stores/@store.Id" class="btn btn-secondary">Edit</a></td>
+                    <td>@storeModel.Model.Id</td>
+                    <td>@storeModel.Model.Name</td>
+                    <td>@storeModel.Model.EmailAddress</td>
+                    <td>@storeModel.Model.Address</td>
+                    <td>@storeModel.Model.IsEnabled</td>
+                    <td><a href="/stores/@storeModel.Model.Id" class="btn btn-secondary">Edit</a></td>
                 </tr>
             }
         </tbody>
@@ -44,10 +51,19 @@ else
 }
 
 @code {
-    private Store[]? stores;
+    private UiModel<Store>[]? storeModels;
+    private StoreFilterCriteria criteria = new();
 
     protected override async Task OnInitializedAsync()
     {
-        stores = await StoreRepository.ListAsync();
+        var stores = await StoreRepository.ListAsync();
+        storeModels = stores.Select(x => new UiModel<Store>(x)).ToArray();
+    }
+
+    private void FilterStores()
+    {
+        if (storeModels != null)
+            foreach (var storeModel in storeModels)
+                storeModel.IsVisible = criteria.AppliesTo(storeModel.Model);
     }
 }

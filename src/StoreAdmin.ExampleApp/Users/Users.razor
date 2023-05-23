@@ -1,6 +1,9 @@
 ﻿@page "/users"
 
+@using StoreAdmin.Core.Stores
+
 @inject IRepository<User> UserRepository
+@inject IRepository<Store> StoreRepository
 
 <PageTitle>Users | Store Admin</PageTitle>
 
@@ -10,7 +13,21 @@
     <a href="/users/create" class="btn btn-primary">Create</a>
 </div>
 
-@if (users == null)
+<EditForm Model="criteria" OnValidSubmit="FilterUsers">
+    <div class="input-group my-2">
+        <InputText id="name" @bind-Value="@criteria.Name" class="form-control" placeholder="Search users" />
+        <InputSelect @bind-Value="criteria.StoreId" class="form-control">
+            <option value="0">All Stores</option>
+            @foreach (var store in stores)
+            {
+                <option value="@store.Id">@store.Name</option>
+            }
+        </InputSelect>
+        <button type="submit" class="btn btn-secondary">Filter</button>
+    </div>
+</EditForm>
+
+@if (userModels == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -28,15 +45,15 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var user in users)
+            @foreach (var userModel in userModels.Where(x => x.IsVisible))
             {
                 <tr>
-                    <td>@user.Id</td>
-                    <td>@user.Name</td>
-                    <td>@user.EmailAddress</td>
-                    <td>@user.IsEnabled</td>
-                    <td>@user.StoreIds.Count()</td>
-                    <td><a href="/users/@user.Id" class="btn btn-secondary">Edit</a></td>
+                    <td>@userModel.Model.Id</td>
+                    <td>@userModel.Model.Name</td>
+                    <td>@userModel.Model.EmailAddress</td>
+                    <td>@userModel.Model.IsEnabled</td>
+                    <td>@userModel.Model.StoreIds.Count()</td>
+                    <td><a href="/users/@userModel.Model.Id" class="btn btn-secondary">Edit</a></td>
                 </tr>
             }
         </tbody>
@@ -44,10 +61,21 @@ else
 }
 
 @code {
-    private User[]? users;
+    private UiModel<User>[]? userModels;
+    private UserFilterCriteria criteria = new();
+    private Store[] stores = Array.Empty<Store>();
 
     protected override async Task OnInitializedAsync()
     {
-        users = await UserRepository.ListAsync();
+        var users = await UserRepository.ListAsync();
+        userModels = users.Select(x => new UiModel<User>(x)).ToArray();
+        stores = await StoreRepository.ListAsync();
+    }
+
+    private void FilterUsers()
+    {
+        if (userModels != null)
+            foreach (var userModel in userModels)
+                userModel.IsVisible = criteria.AppliesTo(userModel.Model);
     }
 }

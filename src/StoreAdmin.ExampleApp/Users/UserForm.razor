@@ -1,4 +1,5 @@
 ﻿@using StoreAdmin.Core.Stores
+@using StoreAdmin.ExampleApp.Stores
 
 @inject IRepository<Store> StoreRepository
 
@@ -23,22 +24,29 @@
 
     <h5>Stores</h5>
 
+    <EditForm Context="StoreFilter" Model="storeCriteria" OnValidSubmit="FilterStores">
+        <div class="input-group my-2">
+            <InputText id="name" @bind-Value="@storeCriteria.Name" class="form-control" placeholder="Search stores" />
+            <button type="submit" class="btn btn-secondary">Filter</button>
+        </div>
+    </EditForm>
+
     <div class="form-group">
-        @if (storeSelections == null)
+        @if (storeModels == null)
         {
             <p><em>Loading Stores...</em></p>
         }
-        else if (!storeSelections.Any())
+        else if (!storeModels.Any())
         {
             <p><em>No stores found</em></p>
         }
         else
         {
-            @foreach (var storeSelection in storeSelections)
+            @foreach (var storeModel in storeModels.Where(x => x.IsVisible))
             {
                 <div class="form-check form-check-inline" style="width: 200px">
-                    <InputCheckbox type="checkbox" @bind-Value="@storeSelection.IsSelected" class="form-check-input" />
-                    <label class="form-check-label" for="@storeSelection.Name">@storeSelection.Name</label>
+                    <InputCheckbox type="checkbox" @bind-Value="@storeModel.IsSelected" class="form-check-input" />
+                    <label class="form-check-label" for="@storeModel.Model.Name">@storeModel.Model.Name</label>
                 </div>
             }
         }
@@ -51,7 +59,8 @@
 </EditForm>
 
 @code {
-    private StoreSelection[]? storeSelections;
+    private UiModel<Store>[]? storeModels;
+    private StoreFilterCriteria storeCriteria = new();
 
     [Parameter, EditorRequired]
     public User User { get; set; } = null!;
@@ -62,29 +71,19 @@
     protected override async Task OnInitializedAsync()
     {
         var stores = await StoreRepository.ListAsync();
-        storeSelections = stores.Select(s => StoreSelection.Build(s, User)).ToArray();
+        storeModels = stores.Select(s => new UiModel<Store>(s) { IsSelected = User.StoreIds.Contains(s.Id) }).ToArray();
     }
 
     private async Task OnValidSubmit()
     {
-        User.StoreIds = storeSelections?.Where(x => x.IsSelected).Select(x => x.Id).ToArray() ?? Array.Empty<int>();
+        User.StoreIds = storeModels?.Where(x => x.IsSelected).Select(x => x.Model.Id).ToArray() ?? Array.Empty<int>();
         await OnSubmit.InvokeAsync(User);
     }
 
-    private class StoreSelection
+    private void FilterStores()
     {
-        public int Id { get; set; }
-        public string? Name { get; set; }
-        public bool IsSelected { get; set; }
-
-        public static StoreSelection Build(Store store, User user)
-        {
-            return new StoreSelection
-            {
-                Id = store.Id,
-                Name = store.Name,
-                IsSelected = user.StoreIds.Contains(store.Id),
-            };
-        }
+        if (storeModels != null)
+            foreach (var storeModel in storeModels)
+                storeModel.IsVisible = storeCriteria.AppliesTo(storeModel.Model);
     }
 }
