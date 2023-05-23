@@ -31,7 +31,12 @@
         </div>
     </EditForm>
 
-    <div class="form-group">
+    <div class="my-2">
+        <button class="btn btn-primary" type="button" @onclick="() => UpdateVisibleStoreSelections(true)">Select All</button>
+        <button class="btn btn-danger" type="button" @onclick="() => UpdateVisibleStoreSelections(false)">Remove All</button>
+    </div>
+
+    <div class="form-group my-2">
         @if (storeModels == null)
         {
             <p><em>Loading Stores...</em></p>
@@ -71,7 +76,7 @@
     protected override async Task OnInitializedAsync()
     {
         var stores = await StoreRepository.ListAsync();
-        storeModels = stores.Select(s => new UiModel<Store>(s) { IsSelected = User.StoreIds.Contains(s.Id) }).ToArray();
+        storeModels = stores.OrderBy(x => x.Name).Select(s => new UiModel<Store>(s) { IsSelected = User.StoreIds.Contains(s.Id) }).ToArray();
     }
 
     private async Task OnValidSubmit()
@@ -85,5 +90,12 @@
         if (storeModels != null)
             foreach (var storeModel in storeModels)
                 storeModel.IsVisible = storeCriteria.AppliesTo(storeModel.Model);
+    }
+
+    private void UpdateVisibleStoreSelections(bool isSelected)
+    {
+        if (storeModels != null)
+            foreach (var storeModel in storeModels.Where(x => x.IsVisible))
+                storeModel.IsSelected = isSelected;
     }
 }
