@@ -3,14 +3,12 @@ using StoreAdmin.Core;
 using StoreAdmin.Core.Data;
 using StoreAdmin.Core.Stores;
 using StoreAdmin.Core.Users;
-using StoreAdmin.ExampleApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
 
 // Register the StoreAdmin services
 builder.Services.AddSingleton<IRepository<Store>, StoreRepository>();
