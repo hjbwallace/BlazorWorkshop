@@ -17,47 +17,69 @@
     </div>
 </EditForm>
 
-@if (storeModels == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Address</th>
-                <th>IsEnabled</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var storeModel in storeModels.Where(x => x.IsVisible))
-            {
+<div id="stores">
+
+    @if (errorMessage != null)
+    {
+        <p>Error: @errorMessage</p>
+    }
+    else if (storeModels == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else if (!storeModels.Any())
+    {
+        <p>No stores found</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@storeModel.Model.Id</td>
-                    <td>@storeModel.Model.Name</td>
-                    <td>@storeModel.Model.EmailAddress</td>
-                    <td>@storeModel.Model.Address</td>
-                    <td>@storeModel.Model.IsEnabled</td>
-                    <td><a href="/stores/@storeModel.Model.Id" class="btn btn-secondary">Edit</a></td>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>IsEnabled</th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var storeModel in storeModels.Where(x => x.IsVisible))
+                {
+                    <tr>
+                        <td>@storeModel.Model.Id</td>
+                        <td>@storeModel.Model.Name</td>
+                        <td>@storeModel.Model.EmailAddress</td>
+                        <td>@storeModel.Model.Address</td>
+                        <td>@storeModel.Model.IsEnabled</td>
+                        <td><a href="/stores/@storeModel.Model.Id" class="btn btn-secondary">Edit</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+</div>
 
 @code {
     private UiModel<Store>[]? storeModels;
     private StoreFilterCriteria criteria = new();
+    private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
-        var stores = await StoreRepository.ListAsync();
-        storeModels = stores.Select(x => new UiModel<Store>(x)).ToArray();
+        try
+        {
+            errorMessage = null;
+            var stores = await StoreRepository.ListAsync();
+            storeModels = stores.Select(x => new UiModel<Store>(x)).ToArray();
+        }
+        catch (Exception ex)
+        {
+            storeModels = null;
+            errorMessage = ex.Message;
+        }
     }
 
     private void FilterStores()
